@@ -84,6 +84,47 @@ app.delete('/products/:id', async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
+app.get('/users', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.get('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.put('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+app.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json({ message: 'User deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
 
 app.post('/users/register', async (req, res) => {
     try {
@@ -108,7 +149,14 @@ app.post('/users/login', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
+app.get('/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().populate('userId').populate('products.productId');
+        res.status(200).json(orders);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 app.post('/orders', async (req, res) => {
     try {
         const order = new Order(req.body);
@@ -118,6 +166,36 @@ app.post('/orders', async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
+app.get('/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id).populate('userId').populate('products.productId');
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        res.status(200).json(order);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.put('/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        res.status(200).json(order);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+app.delete('/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByIdAndDelete(req.params.id);
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        res.status(200).json({ message: 'Order deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 app.get('/orders/:userId', async (req, res) => {
     try {
